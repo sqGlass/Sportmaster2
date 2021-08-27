@@ -1,6 +1,5 @@
 {
   "URLs":"commands",
-  "http://localhost:8080/exit":"Use it for stopping server and clearing port",
   "http://localhost:8080/items":"Show items",
   "http://localhost:8080/items/shoes":"Show shoes",
   "http://localhost:8080/items/jackets":"Show jackets",
