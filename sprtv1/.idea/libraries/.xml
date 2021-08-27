@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="Загрузки">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../Загрузки/jackson-annotations-2.12.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Загрузки/jackson-core-2.12.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Загрузки/jackson-databind-2.12.3.jar!/" />
+      <root url="file://$PROJECT_DIR$/../Загрузки" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../Загрузки" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/../Загрузки" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/../Загрузки" recursive="false" type="SOURCES" />
+  </library>
+</component>
