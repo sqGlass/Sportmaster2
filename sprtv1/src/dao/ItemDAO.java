@@ -9,15 +9,14 @@ import java.util.List;
 public class ItemDAO {
 
     private List<String> types;
+    private List<Item> items;
+    private static int IDs;
 
     {
         types = new ArrayList<>();
         types.add("shoes");
         types.add("jackets");
     }
-
-    private List<Item> items;
-    private static int IDs;
 
     {
         items = new ArrayList<>();
@@ -34,7 +33,7 @@ public class ItemDAO {
     }
 
     public Item getItemById(int id) {
-        if (id <= IDs)
+        if (id < IDs && id >= 0)
             return items.get(id);
         else
             return null;

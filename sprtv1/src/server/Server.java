@@ -7,6 +7,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import dao.ItemDAO;
+import shopper.Shopper;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -15,6 +16,7 @@ import java.util.regex.Pattern;
 public class Server {
     private static HttpServer httpServer;
     private static ItemDAO itemDAO = new ItemDAO();
+    private static Shopper shopper = new Shopper();
     public static void main(String[] args) throws Exception{
         httpServer = HttpServer.create(new InetSocketAddress(8080), 0);
 
@@ -37,7 +39,6 @@ public class Server {
             BufferedInputStream bis = new BufferedInputStream(fis);
             bis.read(bytearray, 0, bytearray.length);
 
-            // ok, we are ready to send the response.
             t.sendResponseHeaders(200, file.length());
             OutputStream os = t.getResponseBody();
             os.write(bytearray,0,bytearray.length);
@@ -63,7 +64,7 @@ public class Server {
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             mapper.writeValue(new File("src/views/users.json"), itemDAO.getTypes());
-            String jsonString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getTypes());
+            mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getTypes());
 
             File file = new File("src/views/users.json");
             byte[] bytearray = new byte[(int) file.length()];
@@ -83,7 +84,7 @@ public class Server {
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             mapper.writeValue(new File("src/views/users.json"), itemDAO.getItemsByType("jackets"));
-            String jsonString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getItemsByType("jackets"));
+            mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getItemsByType("jackets"));
 
             File file = new File ("src/views/users.json");
             byte [] bytearray  = new byte [(int)file.length()];
@@ -104,7 +105,7 @@ public class Server {
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             mapper.writeValue(new File("src/views/users.json"), itemDAO.getItemsByType("shoes"));
-            String jsonString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getItemsByType("shoes"));
+            mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getItemsByType("shoes"));
 
             File file = new File ("src/views/users.json");
             byte [] bytearray  = new byte [(int)file.length()];
@@ -121,9 +122,7 @@ public class Server {
     static class ItemsId implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
 
-            System.out.println(t.getRequestURI());
             String[] paths = t.getRequestURI().toString().split("/");
-            System.out.println(paths[1]);
             int id = -1;
             if (paths.length == 4)
             {
@@ -149,7 +148,7 @@ public class Server {
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             mapper.writeValue(new File("src/views/users.json"), itemDAO.getItemById(id));
-            String jsonString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getItemById(id));
+            mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getItemById(id));
 
             File file = new File ("src/views/users.json");
             byte [] bytearray  = new byte [(int)file.length()];
