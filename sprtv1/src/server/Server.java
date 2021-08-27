@@ -63,10 +63,10 @@ public class Server {
 
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            mapper.writeValue(new File("src/views/users.json"), itemDAO.getTypes());
+            mapper.writeValue(new File("src/views/items.json"), itemDAO.getTypes());
             mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getTypes());
 
-            File file = new File("src/views/users.json");
+            File file = new File("src/views/items.json");
             byte[] bytearray = new byte[(int) file.length()];
             FileInputStream fis = new FileInputStream(file);
             BufferedInputStream bis = new BufferedInputStream(fis);
@@ -83,10 +83,10 @@ public class Server {
 
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            mapper.writeValue(new File("src/views/users.json"), itemDAO.getItemsByType("jackets"));
+            mapper.writeValue(new File("src/views/items.json"), itemDAO.getItemsByType("jackets"));
             mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getItemsByType("jackets"));
 
-            File file = new File ("src/views/users.json");
+            File file = new File ("src/views/items.json");
             byte [] bytearray  = new byte [(int)file.length()];
             FileInputStream fis = new FileInputStream(file);
             BufferedInputStream bis = new BufferedInputStream(fis);
@@ -104,10 +104,10 @@ public class Server {
 
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            mapper.writeValue(new File("src/views/users.json"), itemDAO.getItemsByType("shoes"));
+            mapper.writeValue(new File("src/views/items.json"), itemDAO.getItemsByType("shoes"));
             mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getItemsByType("shoes"));
 
-            File file = new File ("src/views/users.json");
+            File file = new File ("src/views/items.json");
             byte [] bytearray  = new byte [(int)file.length()];
             FileInputStream fis = new FileInputStream(file);
             BufferedInputStream bis = new BufferedInputStream(fis);
@@ -121,15 +121,17 @@ public class Server {
     }
     static class ItemsId implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
-
+            // check for correct index
             String[] paths = t.getRequestURI().toString().split("/");
             int id = -1;
             if (paths.length == 4)
             {
                 boolean isNumber = Pattern.matches("[0-9]+", paths[3]);
-                if (isNumber)
+                if (isNumber) {
                     id = Integer.parseInt(paths[3]);
+                }
             }
+            // if index bad - go to startPage
             if (id == -1)
             {
                 File file = new File ("src/views/startPage.json");
@@ -138,19 +140,39 @@ public class Server {
                 BufferedInputStream bis = new BufferedInputStream(fis);
                 bis.read(bytearray, 0, bytearray.length);
 
-                // ok, we are ready to send the response.
                 t.sendResponseHeaders(200, file.length());
                 OutputStream os = t.getResponseBody();
                 os.write(bytearray,0,bytearray.length);
                 os.close();
+                return;
             }
 
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            mapper.writeValue(new File("src/views/users.json"), itemDAO.getItemById(id));
-            mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getItemById(id));
+            // if index is good - check method: GET or POST
+            if (t.getRequestMethod().equalsIgnoreCase("POST"))
+            {
+                if (itemDAO.getItemById(id) != null)
+                    shopper.addItem(itemDAO.getItemById(id));
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.enable(SerializationFeature.INDENT_OUTPUT);
+                File file = new File("src/views/items.json");
+                mapper.writeValue(file, shopper);
 
-            File file = new File ("src/views/users.json");
+//                mapper.writeValue(file,shopper.getSumCost());
+//                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(shopper);
+//                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(shopper.getSumCost());
+                System.out.println("METHOD POST");
+            }
+            else
+            {
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.enable(SerializationFeature.INDENT_OUTPUT);
+                mapper.writeValue(new File("src/views/items.json"), itemDAO.getItemById(id));
+                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getItemById(id));
+                System.out.println(t.getRequestMethod());
+                System.out.println("METHOD GET");
+            }
+
+            File file = new File ("src/views/items.json");
             byte [] bytearray  = new byte [(int)file.length()];
             FileInputStream fis = new FileInputStream(file);
             BufferedInputStream bis = new BufferedInputStream(fis);

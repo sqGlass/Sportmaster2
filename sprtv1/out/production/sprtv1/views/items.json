@@ -1,0 +1,18 @@
+{
+  "sumCost" : 500,
+  "purchses" : [ {
+    "id" : 3,
+    "size" : 52,
+    "price" : 250,
+    "type" : "jackets",
+    "model" : "Jordan Essentials",
+    "color" : "red"
+  }, {
+    "id" : 3,
+    "size" : 52,
+    "price" : 250,
+    "type" : "jackets",
+    "model" : "Jordan Essentials",
+    "color" : "red"
+  } ]
+}

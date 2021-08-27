@@ -20,12 +20,12 @@ public class ItemDAO {
 
     {
         items = new ArrayList<>();
-        items.add(new Item(IDs++,46, "shoes", "Zoom Freak 3", "red"));
-        items.add(new Item(IDs++,49, "shoes", "Zoom Freak 3", "green"));
-        items.add(new Item(IDs++,45, "shoes", "Zoom Freak 3", "black"));
+        items.add(new Item(IDs++,46, 300, "shoes", "Zoom Freak 3", "red"));
+        items.add(new Item(IDs++,49, 300, "shoes", "Zoom Freak 3", "green"));
+        items.add(new Item(IDs++,45, 300,"shoes", "Zoom Freak 3", "black"));
 
-        items.add(new Item(IDs++,52, "jackets", "Jordan Essentials", "red"));
-        items.add(new Item(IDs++,56, "jackets", "Jordan Essentials", "red"));
+        items.add(new Item(IDs++,52, 250, "jackets", "Jordan Essentials", "red"));
+        items.add(new Item(IDs++,56, 250, "jackets", "Jordan Essentials", "red"));
     }
 
     public List<Item> getItems() {
