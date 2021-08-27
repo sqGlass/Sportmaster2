@@ -1,18 +1,4 @@
 {
-  "sumCost" : 550,
-  "purchses" : [ {
-    "id" : 3,
-    "size" : 52,
-    "price" : 250,
-    "type" : "jackets",
-    "model" : "Jordan Essentials",
-    "color" : "red"
-  }, {
-    "id" : 2,
-    "size" : 45,
-    "price" : 300,
-    "type" : "shoes",
-    "model" : "Zoom Freak 3",
-    "color" : "black"
-  } ]
+  "sumCost" : 0,
+  "purchses" : [ ]
 }

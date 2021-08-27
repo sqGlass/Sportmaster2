@@ -22,6 +22,14 @@ public class Shopper {
             sumCost+= item.getPrice();
         }
     }
+
+    public void deleteItem(Item item) {
+        if (purchses.contains(item))
+        {
+            purchses.remove(item);
+            sumCost-=item.getPrice();
+        }
+    }
     public List<Item> getPurchses() {
         return purchses;
     }

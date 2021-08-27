@@ -22,10 +22,12 @@ public class Server {
 
         httpServer.createContext("/exit", new Exit());
         httpServer.createContext("/", new Hello());
+        httpServer.createContext("/myshopper", new MyShopper());
         httpServer.createContext("/items/jackets", new ItemsJackets());
         httpServer.createContext("/items/shoes", new ItemsShoes());
         httpServer.createContext("/items/id", new ItemsId());
         httpServer.createContext("/items", new Items());
+        httpServer.createContext("/myshopper/delete", new DeletePurchase());
         httpServer.setExecutor(null);
         httpServer.start();
     }
@@ -64,7 +66,7 @@ public class Server {
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             mapper.writeValue(new File("src/views/items.json"), itemDAO.getTypes());
-            mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getTypes());
+            //mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getTypes());
 
             File file = new File("src/views/items.json");
             byte[] bytearray = new byte[(int) file.length()];
@@ -84,7 +86,7 @@ public class Server {
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             mapper.writeValue(new File("src/views/items.json"), itemDAO.getItemsByType("jackets"));
-            mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getItemsByType("jackets"));
+            //mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getItemsByType("jackets"));
 
             File file = new File ("src/views/items.json");
             byte [] bytearray  = new byte [(int)file.length()];
@@ -105,7 +107,7 @@ public class Server {
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             mapper.writeValue(new File("src/views/items.json"), itemDAO.getItemsByType("shoes"));
-            mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getItemsByType("shoes"));
+//            mapper.writerWithDefaultPrettyPrinter().writeValueAsString(itemDAO.getItemsByType("shoes"));
 
             File file = new File ("src/views/items.json");
             byte [] bytearray  = new byte [(int)file.length()];
@@ -157,9 +159,6 @@ public class Server {
                 File file = new File("src/views/items.json");
                 mapper.writeValue(file, shopper);
 
-//                mapper.writeValue(file,shopper.getSumCost());
-//                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(shopper);
-//                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(shopper.getSumCost());
                 System.out.println("METHOD POST");
             }
             else
@@ -182,6 +181,74 @@ public class Server {
             OutputStream os = t.getResponseBody();
             os.write(bytearray,0,bytearray.length);
             os.close();
+        }
+    }
+
+    static class MyShopper implements HttpHandler {
+        public void handle(HttpExchange t) throws IOException {
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            mapper.writeValue(new File("src/views/items.json"), shopper);
+
+            File file = new File("src/views/items.json");
+            byte[] bytearray = new byte[(int) file.length()];
+            FileInputStream fis = new FileInputStream(file);
+            BufferedInputStream bis = new BufferedInputStream(fis);
+            bis.read(bytearray, 0, bytearray.length);
+
+            t.sendResponseHeaders(200, file.length());
+            OutputStream os = t.getResponseBody();
+            os.write(bytearray, 0, bytearray.length);
+            os.close();
+        }
+    }
+    static class DeletePurchase implements HttpHandler {
+        public void handle(HttpExchange t) throws IOException {
+
+            // check for correct index
+            String[] paths = t.getRequestURI().toString().split("/");
+            int id = -1;
+            if (paths.length == 4) {
+                boolean isNumber = Pattern.matches("[0-9]+", paths[3]);
+                if (isNumber) {
+                    id = Integer.parseInt(paths[3]);
+                }
+            }
+            // if index bad - go to startPage
+            if (id == -1) {
+                File file = new File("src/views/startPage.json");
+                byte[] bytearray = new byte[(int) file.length()];
+                FileInputStream fis = new FileInputStream(file);
+                BufferedInputStream bis = new BufferedInputStream(fis);
+                bis.read(bytearray, 0, bytearray.length);
+
+                t.sendResponseHeaders(200, file.length());
+                OutputStream os = t.getResponseBody();
+                os.write(bytearray, 0, bytearray.length);
+                os.close();
+                return;
+            }
+
+            if (t.getRequestMethod().equalsIgnoreCase("DELETE")) {
+                if (itemDAO.getItemById(id) != null)
+                    shopper.deleteItem(itemDAO.getItemById(id));
+
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.enable(SerializationFeature.INDENT_OUTPUT);
+                mapper.writeValue(new File("src/views/items.json"), shopper);
+
+                File file = new File("src/views/items.json");
+                byte[] bytearray = new byte[(int) file.length()];
+                FileInputStream fis = new FileInputStream(file);
+                BufferedInputStream bis = new BufferedInputStream(fis);
+                bis.read(bytearray, 0, bytearray.length);
+
+                t.sendResponseHeaders(200, file.length());
+                OutputStream os = t.getResponseBody();
+                os.write(bytearray, 0, bytearray.length);
+                os.close();
+            }
         }
     }
 
