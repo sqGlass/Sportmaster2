@@ -1,4 +1,12 @@
 {
-  "sumCost" : 0,
-  "purchses" : [ ]
+  "id" : 1,
+  "name" : "Vasya",
+  "login" : "vasyaKill",
+  "password" : "777",
+  "balance" : 199,
+  "personalDailyDiscount" : 9,
+  "shopper" : {
+    "sumCost" : 0,
+    "purchses" : [ ]
+  }
 }

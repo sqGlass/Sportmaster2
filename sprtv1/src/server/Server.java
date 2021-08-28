@@ -30,10 +30,10 @@ public class Server {
         httpServer = HttpServer.create(new InetSocketAddress(8080), 0);
 
         httpServer.createContext("/", new Hello());
-
         httpServer.createContext("/login", new Autorization());
-
+        httpServer.createContext("/account", new Account());
         httpServer.createContext("/myshopper", new MyShopper());
+        httpServer.createContext("/myshopper/buy", new Purchase());
         httpServer.createContext("/items/jackets", new ItemsJackets());
         httpServer.createContext("/items/shoes", new ItemsShoes());
         httpServer.createContext("/items/id", new ItemsId());
@@ -78,6 +78,16 @@ public class Server {
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             mapper.writeValue(new File("src/views/items.json"),customer);
+            Server.doResponse(t, "src/views/items.json");
+        }
+    }
+
+    static class Account implements HttpHandler {
+        public void handle(HttpExchange t) throws IOException {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            mapper.writeValue(new File("src/views/items.json"), customer);
+
             Server.doResponse(t, "src/views/items.json");
         }
     }
@@ -167,6 +177,26 @@ public class Server {
             Server.doResponse(t, "src/views/items.json");
         }
     }
+
+    static class Purchase implements HttpHandler {
+        public void handle(HttpExchange t) throws IOException {
+            if (!t.getRequestMethod().equalsIgnoreCase("POST"))
+                Server.doResponse(t, "src/views/startPage.json");
+            else if (customer.getShopper().getPurchses().isEmpty())
+                Server.doResponse(t, "src/views/emptyShopper.json");
+            else if (!customer.buyItems())
+                Server.doResponse(t, "src/views/notEnoughMoney.json");
+            else
+            {
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.enable(SerializationFeature.INDENT_OUTPUT);
+                mapper.writeValue(new File("src/views/items.json"), customer);
+
+                Server.doResponse(t, "src/views/items.json");
+            }
+        }
+    }
+
     static class DeletePurchase implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
             if (customer == null)

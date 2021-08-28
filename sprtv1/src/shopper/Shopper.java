@@ -37,4 +37,8 @@ public class Shopper {
     public int getSumCost() {
         return sumCost;
     }
+
+    public void setSumCost(int sumCost) {
+        this.sumCost = sumCost;
+    }
 }

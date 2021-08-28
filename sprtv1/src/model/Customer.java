@@ -95,6 +95,20 @@ public class Customer {
             this.personalDailyDiscount = personalDailyDiscount;
     }
 
+    public boolean buyItems() {
+        double priceAfterDiscount;
+        if (this.shopper.getPurchses().isEmpty())
+            return false;
+
+        priceAfterDiscount = shopper.getSumCost() - (shopper.getSumCost() / 100.0 * personalDailyDiscount);
+        if (priceAfterDiscount > balance)
+            return false;
+        balance -= priceAfterDiscount;
+        shopper.getPurchses().clear();
+        shopper.setSumCost(0);
+        return true;
+    }
+
     public Shopper getShopper() {
         return shopper;
     }
