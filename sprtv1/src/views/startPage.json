@@ -3,10 +3,10 @@
   "http://localhost:8080/items":"Show items",
   "http://localhost:8080/items/shoes":"Show shoes",
   "http://localhost:8080/items/jackets":"Show jackets",
-  "http://localhost:8080/shopper":"Show ur purchases",
+  "http://localhost:8080/myshopper":"Show ur purchases",
   "GET http://localhost:8080/items/id/{id}":"Show item by id",
   "POST http://localhost:8080/items/id/{id}":"Add item to shopper",
   "DELETE http://localhost:8080/myshopper/delete/{id}":"Delete item from shopper",
-  "POST http://localhost:8080/login?login={urLogin}&pass={urPassword}":"Autorization"
-
+  "POST http://localhost:8080/login?login={urLogin}&pass={urPassword}":"Autorization",
+  "GET http://localhost:8080/account":"Users account"
 }
