@@ -1,19 +1,12 @@
 {
-  "id" : 1,
-  "name" : "Vasya",
-  "login" : "vasyaKill",
-  "password" : "777",
-  "balance" : 243,
-  "personalDailyDiscount" : 17,
+  "id" : 0,
+  "name" : "Sasha",
+  "login" : "sasha1337",
+  "password" : "1234",
+  "balance" : 1500,
+  "personalDailyDiscount" : 24,
   "shopper" : {
-    "sumCost" : 300,
-    "purchses" : [ {
-      "id" : 2,
-      "size" : 45,
-      "price" : 300,
-      "type" : "shoes",
-      "model" : "Zoom Freak 3",
-      "color" : "black"
-    } ]
+    "sumCost" : 0,
+    "purchses" : [ ]
   }
 }

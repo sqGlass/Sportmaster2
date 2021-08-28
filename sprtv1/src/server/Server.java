@@ -182,6 +182,8 @@ public class Server {
         public void handle(HttpExchange t) throws IOException {
             if (!t.getRequestMethod().equalsIgnoreCase("POST"))
                 Server.doResponse(t, "src/views/startPage.json");
+            else if (customer == null)
+                doResponse(t, "src/views/askAutorization.json");
             else if (customer.getShopper().getPurchses().isEmpty())
                 Server.doResponse(t, "src/views/emptyShopper.json");
             else if (!customer.buyItems())
