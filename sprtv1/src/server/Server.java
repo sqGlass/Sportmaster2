@@ -6,6 +6,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import dao.ItemDAO;
+import model.Item;
 import shopper.Shopper;
 
 import java.io.*;
@@ -87,11 +88,13 @@ public class Server {
             if (t.getRequestMethod().equalsIgnoreCase("POST"))
             {
                 if (itemDAO.getItemById(id) != null)
+                {
                     shopper.addItem(itemDAO.getItemById(id));
+                    itemDAO.deleteItemById(id);
+                }
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.enable(SerializationFeature.INDENT_OUTPUT);
                 mapper.writeValue(new File("src/views/items.json"), shopper);
-                System.out.println("HERE");
             }
             else
             {
@@ -125,8 +128,14 @@ public class Server {
                 return;
             }
             if (t.getRequestMethod().equalsIgnoreCase("DELETE")) {
-                if (itemDAO.getItemById(id) != null)
-                    shopper.deleteItem(itemDAO.getItemById(id));
+                for (Item ite:
+                     shopper.getPurchses()) {
+                    if (ite.getId() == id)
+                    {
+                        shopper.deleteItem(ite);
+                        itemDAO.returnItemToShopFromShopper(ite);
+                    }
+                }
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.enable(SerializationFeature.INDENT_OUTPUT);
                 mapper.writeValue(new File("src/views/items.json"), shopper);

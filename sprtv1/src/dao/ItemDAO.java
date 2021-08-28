@@ -33,11 +33,18 @@ public class ItemDAO {
     }
 
     public Item getItemById(int id) {
-        if (id < IDs && id >= 0)
-            return items.get(id);
-        else
-            return null;
+
+        for (Item ite:
+             items) {
+            if (ite.getId() == id)
+                return ite;
+        }
+        return null;
     }
+    public void deleteItemById(int id) {
+        items.removeIf(ite -> ite.getId() == id);
+    }
+
 
     public  List<String> getTypes() {
         return types;
@@ -52,4 +59,10 @@ public class ItemDAO {
         }
         return retItems;
     }
+
+    public void returnItemToShopFromShopper(Item item)
+    {
+        items.add(item);
+    }
+
 }
