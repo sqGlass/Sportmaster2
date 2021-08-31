@@ -44,25 +44,26 @@ public class Server {
 
     static class Hello implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
-            Server.doResponse(t, "src/views/startPage.json");
+            System.out.println("helllp");
+            Server.doResponse(t, "src/main/resources/views/startPage.json");
         }
     }
 
     static class Autorization implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
             if (!t.getRequestMethod().equalsIgnoreCase("POST")) {
-                doResponse(t, "src/views/startPage.json");
+                doResponse(t, "src/main/resources/views/startPage.json");
                 return;
             }
 
             Map<String, String> params = queryToMap(t.getRequestURI().getQuery());
             if (params.size() != 2 || !params.containsKey("login") || !params.containsKey("pass")) {
 
-                doResponse(t, "src/views/autorizationError.json");
+                doResponse(t, "src/main/resources/views/autorizationError.json");
                 return;
             } else if (params.get("login").length() < 1 || params.get("pass").length() < 1 ||
                     customerDAO.findCustomerByLoginAndPassword(params.get("login"), params.get("pass")) == null) {
-                doResponse(t, "src/views/autorizationError.json");
+                doResponse(t, "src/main/resources/views/autorizationError.json");
                 return;
             }
 
@@ -70,8 +71,8 @@ public class Server {
             customer.setPersonalDailyDiscount(getPersonalDailyDiscount());
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            mapper.writeValue(new File("src/views/items.json"), customer);
-            Server.doResponse(t, "src/views/items.json");
+            mapper.writeValue(new File("src/main/resources/views/items.json"), customer);
+            Server.doResponse(t, "src/main/resources/views/items.json");
         }
     }
 
@@ -79,9 +80,9 @@ public class Server {
         public void handle(HttpExchange t) throws IOException {
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            mapper.writeValue(new File("src/views/items.json"), customer);
+            mapper.writeValue(new File("src/main/resources/views/items.json"), customer);
 
-            Server.doResponse(t, "src/views/items.json");
+            Server.doResponse(t, "src/main/resources/views/items.json");
         }
     }
 
@@ -90,9 +91,9 @@ public class Server {
 
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            mapper.writeValue(new File("src/views/items.json"), itemDAO.getTypes());
+            mapper.writeValue(new File("src/main/resources/views/items.json"), itemDAO.getTypes());
 
-            Server.doResponse(t, "src/views/items.json");
+            Server.doResponse(t, "src/main/resources/views/items.json");
         }
     }
 
@@ -103,30 +104,30 @@ public class Server {
                 if (countFolders(t) == 1) {
                     ObjectMapper mapper = new ObjectMapper();
                     mapper.enable(SerializationFeature.INDENT_OUTPUT);
-                    mapper.writeValue(new File("src/views/items.json"), itemDAO.getItems());
+                    mapper.writeValue(new File("src/main/resources/views/items.json"), itemDAO.getItems());
                 } else if (countFolders(t) == 2) {
                     // check for correct index
                     id = Server.findId(t, 2, 2);
 
                     // if index bad - go to startPage
                     if (id == -1) {
-                        Server.doResponse(t, "src/views/startPage.json");
+                        Server.doResponse(t, "src/main/resources/views/startPage.json");
                         return;
                     }
                     ObjectMapper mapper = new ObjectMapper();
                     mapper.enable(SerializationFeature.INDENT_OUTPUT);
-                    mapper.writeValue(new File("src/views/items.json"), itemDAO.getItemById(id));
+                    mapper.writeValue(new File("src/main/resources/views/items.json"), itemDAO.getItemById(id));
                 }
             } else if (t.getRequestMethod().equalsIgnoreCase("POST")) {
                 id = Server.findId(t, 2, 2);
 
                 // if index bad - go to startPage
                 if (id == -1) {
-                    Server.doResponse(t, "src/views/startPage.json");
+                    Server.doResponse(t, "src/main/resources/views/startPage.json");
                     return;
                 }
                 if (customer == null) {
-                    doResponse(t, "src/views/askAutorization.json");
+                    doResponse(t, "src/main/resources/views/askAutorization.json");
                     return;
                 } else if (itemDAO.getItemById(id) != null) {
                     customer.addItemToShopper(itemDAO.getItemById(id));
@@ -134,9 +135,9 @@ public class Server {
                 }
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.enable(SerializationFeature.INDENT_OUTPUT);
-                mapper.writeValue(new File("src/views/items.json"), customer.getShopper());
+                mapper.writeValue(new File("src/main/resources/views/items.json"), customer.getShopper());
             }
-            Server.doResponse(t, "src/views/items.json");
+            Server.doResponse(t, "src/main/resources/views/items.json");
         }
     }
 
@@ -145,9 +146,9 @@ public class Server {
 
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            mapper.writeValue(new File("src/views/items.json"), itemDAO.getItemsByType("jackets"));
+            mapper.writeValue(new File("src/main/resources/views/items.json"), itemDAO.getItemsByType("jackets"));
 
-            Server.doResponse(t, "src/views/items.json");
+            Server.doResponse(t, "src/main/resources/views/items.json");
         }
     }
 
@@ -156,8 +157,8 @@ public class Server {
 
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            mapper.writeValue(new File("src/views/items.json"), itemDAO.getItemsByType("shoes"));
-            Server.doResponse(t, "src/views/items.json");
+            mapper.writeValue(new File("src/main/resources/views/items.json"), itemDAO.getItemsByType("shoes"));
+            Server.doResponse(t, "src/main/resources/views/items.json");
         }
     }
 
@@ -166,23 +167,23 @@ public class Server {
         public void handle(HttpExchange t) throws IOException {
             int id;
             if (customer == null) {
-                doResponse(t, "src/views/askAutorization.json");
+                doResponse(t, "src/main/resources/views/askAutorization.json");
                 return;
             }
 
             if (t.getRequestMethod().equalsIgnoreCase("GET")) {
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.enable(SerializationFeature.INDENT_OUTPUT);
-                mapper.writeValue(new File("src/views/items.json"), customer.getShopper());
+                mapper.writeValue(new File("src/main/resources/views/items.json"), customer.getShopper());
             } else if (t.getRequestMethod().equalsIgnoreCase("POST")) {
                 if (customer.getShopper().getPurchses().isEmpty()) {
-                    Server.doResponse(t, "src/views/emptyShopper.json");
+                    Server.doResponse(t, "src/main/resources/views/emptyShopper.json");
                 } else if (!customer.buyItems()) {
-                    Server.doResponse(t, "src/views/notEnoughMoney.json");
+                    Server.doResponse(t, "src/main/resources/views/notEnoughMoney.json");
                 } else {
                     ObjectMapper mapper = new ObjectMapper();
                     mapper.enable(SerializationFeature.INDENT_OUTPUT);
-                    mapper.writeValue(new File("src/views/items.json"), customer);
+                    mapper.writeValue(new File("src/main/resources/views/items.json"), customer);
                 }
             } else if (t.getRequestMethod().equalsIgnoreCase("DELETE")) {
                 // check for correct index
@@ -190,7 +191,7 @@ public class Server {
 
                 // if index bad - go to startPage
                 if (id == -1) {
-                    Server.doResponse(t, "src/views/startPage.json");
+                    Server.doResponse(t, "src/main/resources/views/startPage.json");
                     return;
                 }
                 for (Item ite : customer.getShopper().getPurchses()) {
@@ -202,9 +203,9 @@ public class Server {
                 }
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.enable(SerializationFeature.INDENT_OUTPUT);
-                mapper.writeValue(new File("src/views/items.json"), customer.getShopper());
+                mapper.writeValue(new File("src/main/resources/views/items.json"), customer.getShopper());
             }
-            Server.doResponse(t, "src/views/items.json");
+            Server.doResponse(t, "src/main/resources/views/items.json");
         }
     }
 
