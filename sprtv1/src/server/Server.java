@@ -30,13 +30,12 @@ public class Server {
         httpServer.createContext("/", new Hello());
         httpServer.createContext("/login", new Autorization());
         httpServer.createContext("/account", new Account());
-       // httpServer.createContext("/order", new MyShopper());
-        httpServer.createContext("/order/buy", new Purchase());
-        httpServer.createContext("/items/jackets", new ItemsJackets());
-        httpServer.createContext("/items/shoes", new ItemsShoes());
-        httpServer.createContext("/items/id", new ItemsId());
-        httpServer.createContext("/items", new Items());
-        httpServer.createContext("/order/delete", new DeletePurchase());
+        httpServer.createContext("/orders", new MyShopper());
+        httpServer.createContext("/items/categories/jackets", new ItemsJackets());
+        httpServer.createContext("/items/categories/shoes", new ItemsShoes());
+        httpServer.createContext("/items/categories", new Items());
+        httpServer.createContext("/items", new AllItems());
+
         httpServer.setExecutor(null);
         httpServer.start();
 
@@ -97,6 +96,50 @@ public class Server {
         }
     }
 
+    static class AllItems implements HttpHandler {
+        public void handle(HttpExchange t) throws IOException {
+            int id;
+            if (t.getRequestMethod().equalsIgnoreCase("GET")) {
+                if (countFolders(t) == 1) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    mapper.enable(SerializationFeature.INDENT_OUTPUT);
+                    mapper.writeValue(new File("src/views/items.json"), itemDAO.getItems());
+                } else if (countFolders(t) == 2) {
+                    // check for correct index
+                    id = Server.findId(t, 2, 2);
+
+                    // if index bad - go to startPage
+                    if (id == -1) {
+                        Server.doResponse(t, "src/views/startPage.json");
+                        return;
+                    }
+                    ObjectMapper mapper = new ObjectMapper();
+                    mapper.enable(SerializationFeature.INDENT_OUTPUT);
+                    mapper.writeValue(new File("src/views/items.json"), itemDAO.getItemById(id));
+                }
+            } else if (t.getRequestMethod().equalsIgnoreCase("POST")) {
+                id = Server.findId(t, 2, 2);
+
+                // if index bad - go to startPage
+                if (id == -1) {
+                    Server.doResponse(t, "src/views/startPage.json");
+                    return;
+                }
+                if (customer == null) {
+                    doResponse(t, "src/views/askAutorization.json");
+                    return;
+                } else if (itemDAO.getItemById(id) != null) {
+                    customer.addItemToShopper(itemDAO.getItemById(id));
+                    itemDAO.deleteItemById(id);
+                }
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.enable(SerializationFeature.INDENT_OUTPUT);
+                mapper.writeValue(new File("src/views/items.json"), customer.getShopper());
+            }
+            Server.doResponse(t, "src/views/items.json");
+        }
+    }
+
     static class ItemsJackets implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
 
@@ -114,97 +157,42 @@ public class Server {
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             mapper.writeValue(new File("src/views/items.json"), itemDAO.getItemsByType("shoes"));
-
-            Server.doResponse(t, "src/views/items.json");
-
-        }
-    }
-
-    static class ItemsId implements HttpHandler {
-        public void handle(HttpExchange t) throws IOException {
-            // check for correct index
-            int id = Server.findId(t);
-
-            // if index bad - go to startPage
-            if (id == -1) {
-                Server.doResponse(t, "src/views/startPage.json");
-                return;
-            }
-
-            // if index is good - check method: GET or POST
-            if (t.getRequestMethod().equalsIgnoreCase("POST")) {
-                if (customer == null) {
-                    doResponse(t, "src/views/askAutorization.json");
-                    return;
-                } else if (itemDAO.getItemById(id) != null) {
-                    customer.addItemToShopper(itemDAO.getItemById(id));
-                    itemDAO.deleteItemById(id);
-                }
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.enable(SerializationFeature.INDENT_OUTPUT);
-                mapper.writeValue(new File("src/views/items.json"), customer.getShopper());
-            } else {
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.enable(SerializationFeature.INDENT_OUTPUT);
-                mapper.writeValue(new File("src/views/items.json"), itemDAO.getItemById(id));
-            }
             Server.doResponse(t, "src/views/items.json");
         }
     }
+
 
     static class MyShopper implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
-//            if (t.getRequestMethod().equalsIgnoreCase("GET"))
-//            {
-//
-//            }
+            int id;
             if (customer == null) {
                 doResponse(t, "src/views/askAutorization.json");
                 return;
             }
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            mapper.writeValue(new File("src/views/items.json"), customer.getShopper());
 
-            Server.doResponse(t, "src/views/items.json");
-        }
-    }
-
-    static class Purchase implements HttpHandler {
-        public void handle(HttpExchange t) throws IOException {
-            if (!t.getRequestMethod().equalsIgnoreCase("POST")) {
-                Server.doResponse(t, "src/views/startPage.json");
-            } else if (customer == null) {
-                doResponse(t, "src/views/askAutorization.json");
-            } else if (customer.getShopper().getPurchses().isEmpty()) {
-                Server.doResponse(t, "src/views/emptyShopper.json");
-            } else if (!customer.buyItems()) {
-                Server.doResponse(t, "src/views/notEnoughMoney.json");
-            } else {
+            if (t.getRequestMethod().equalsIgnoreCase("GET")) {
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.enable(SerializationFeature.INDENT_OUTPUT);
-                mapper.writeValue(new File("src/views/items.json"), customer);
+                mapper.writeValue(new File("src/views/items.json"), customer.getShopper());
+            } else if (t.getRequestMethod().equalsIgnoreCase("POST")) {
+                if (customer.getShopper().getPurchses().isEmpty()) {
+                    Server.doResponse(t, "src/views/emptyShopper.json");
+                } else if (!customer.buyItems()) {
+                    Server.doResponse(t, "src/views/notEnoughMoney.json");
+                } else {
+                    ObjectMapper mapper = new ObjectMapper();
+                    mapper.enable(SerializationFeature.INDENT_OUTPUT);
+                    mapper.writeValue(new File("src/views/items.json"), customer);
+                }
+            } else if (t.getRequestMethod().equalsIgnoreCase("DELETE")) {
+                // check for correct index
+                id = Server.findId(t, 2, 2);
 
-                Server.doResponse(t, "src/views/items.json");
-            }
-        }
-    }
-
-    static class DeletePurchase implements HttpHandler {
-        public void handle(HttpExchange t) throws IOException {
-            if (customer == null) {
-                doResponse(t, "src/views/askAutorization.json");
-                return;
-            }
-            // check for correct index
-            int id = Server.findId(t);
-
-            // if index bad - go to startPage
-            if (id == -1) {
-                Server.doResponse(t, "src/views/startPage.json");
-                return;
-            }
-            if (t.getRequestMethod().equalsIgnoreCase("DELETE")) {
+                // if index bad - go to startPage
+                if (id == -1) {
+                    Server.doResponse(t, "src/views/startPage.json");
+                    return;
+                }
                 for (Item ite : customer.getShopper().getPurchses()) {
                     if (ite.getId() == id) {
                         customer.deleteItemFromShopper(ite);
@@ -215,11 +203,8 @@ public class Server {
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.enable(SerializationFeature.INDENT_OUTPUT);
                 mapper.writeValue(new File("src/views/items.json"), customer.getShopper());
-
-                Server.doResponse(t, "src/views/items.json");
-            } else {
-                Server.doResponse(t, "src/views/startPage.json");
             }
+            Server.doResponse(t, "src/views/items.json");
         }
     }
 
@@ -236,18 +221,22 @@ public class Server {
         os.close();
     }
 
-    public static int findId(HttpExchange t) {
+    public static int findId(HttpExchange t, int numberForCheck, int expectedNumberOfFolders) {
         String[] paths = t.getRequestURI().toString().split("/");
         int id = -1;
-        if (paths.length == 4) {
-            boolean isNumber = Pattern.matches("[0-9]+", paths[3]);
+        if (paths.length - 1 == expectedNumberOfFolders) {
+            boolean isNumber = Pattern.matches("[0-9]+", paths[numberForCheck]);
             if (isNumber) {
-                id = Integer.parseInt(paths[3]);
+                id = Integer.parseInt(paths[numberForCheck]);
             }
         }
         return id;
     }
 
+    public static int countFolders(HttpExchange t) {
+        String[] paths = t.getRequestURI().toString().split("/");
+        return paths.length - 1;
+    }
 
 
     public static Map<String, String> queryToMap(String query) {

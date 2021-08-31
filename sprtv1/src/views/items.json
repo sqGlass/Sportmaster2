@@ -1,1 +1,4 @@
-[ "shoes", "jackets" ]
+{
+  "sumCost" : 0,
+  "purchses" : [ ]
+}
