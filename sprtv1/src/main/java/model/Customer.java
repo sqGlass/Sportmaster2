@@ -1,15 +1,21 @@
 package model;
 
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Setter;
 import shopper.Order;
 
 import java.util.Objects;
 
+@Data
 public class Customer {
 
+    @Setter(AccessLevel.NONE)
     private int id;
     private String name;
     private String login;
     private String password;
+    @Setter(AccessLevel.NONE)
     private int balance;
     private int personalDailyDiscount;
 
@@ -23,42 +29,6 @@ public class Customer {
         this.balance = balance;
         this.shopper = shopper;
         this.personalDailyDiscount = 0;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public int getBalance() {
-        return balance;
-    }
-
-    public void setBalance(int balance) {
-        this.balance = balance;
-    }
-
-    public int getId() {
-        return id;
     }
 
 
@@ -82,10 +52,6 @@ public class Customer {
         shopper.deleteItem(item);
     }
 
-    public int getPersonalDailyDiscount() {
-        return personalDailyDiscount;
-    }
-
     public void setPersonalDailyDiscount(int personalDailyDiscount) {
         if (this.personalDailyDiscount == 0) {
             this.personalDailyDiscount = personalDailyDiscount;
@@ -106,26 +72,5 @@ public class Customer {
         shopper.getPurchses().clear();
         shopper.setSumCost(0);
         return true;
-    }
-
-    public Order getShopper() {
-        return shopper;
-    }
-
-    public void setShopper(Order shopper) {
-        this.shopper = shopper;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Customer customer = (Customer) o;
-        return id == customer.id && balance == customer.balance && Objects.equals(name, customer.name) && Objects.equals(login, customer.login) && Objects.equals(password, customer.password);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, login, password, balance);
     }
 }

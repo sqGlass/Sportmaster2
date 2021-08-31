@@ -1,10 +1,12 @@
 package shopper;
 
+import lombok.Data;
 import model.Item;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
 public class Order {
 
     private int sumCost;
@@ -29,15 +31,4 @@ public class Order {
         }
     }
 
-    public List<Item> getPurchses() {
-        return purchses;
-    }
-
-    public int getSumCost() {
-        return sumCost;
-    }
-
-    public void setSumCost(int sumCost) {
-        this.sumCost = sumCost;
-    }
 }

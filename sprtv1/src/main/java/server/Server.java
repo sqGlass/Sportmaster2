@@ -1,5 +1,6 @@
 package server;
 
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.sun.net.httpserver.HttpExchange;
@@ -22,7 +23,6 @@ public class Server {
     private static Customer customer;
     private static CustomerDAO customerDAO = new CustomerDAO();
     private static ItemDAO itemDAO = new ItemDAO();
-
 
     public static void main(String[] args) throws Exception {
         httpServer = HttpServer.create(new InetSocketAddress(8080), 0);

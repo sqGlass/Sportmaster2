@@ -1,11 +1,13 @@
 package dao;
 
+import lombok.Data;
 import model.Customer;
 import shopper.Order;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
 
 public class CustomerDAO {
 
