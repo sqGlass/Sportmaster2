@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.Setter;
 import shopper.Order;
 
-import java.util.Objects;
-
 @Data
 public class Customer {
 

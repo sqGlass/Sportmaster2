@@ -1,6 +1,5 @@
 package dao;
 
-import lombok.Data;
 import model.Customer;
 import shopper.Order;
 
