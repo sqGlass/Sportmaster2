@@ -1,6 +1,6 @@
 package model;
 
-import shopper.Shopper;
+import shopper.Order;
 
 import java.util.Objects;
 
@@ -13,9 +13,9 @@ public class Customer {
     private int balance;
     private int personalDailyDiscount;
 
-    private Shopper shopper;
+    private Order shopper;
 
-    public Customer(int id, String name, String login, String password, int balance, Shopper shopper) {
+    public Customer(int id, String name, String login, String password, int balance, Order shopper) {
         this.id = id;
         this.name = name;
         this.login = login;
@@ -61,9 +61,6 @@ public class Customer {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public void addMoney(int money) {
         this.balance += money;
@@ -73,8 +70,7 @@ public class Customer {
         if (this.balance - money >= 0) {
             this.balance -= money;
             return true;
-        }
-        else
+        } else
             return false;
     }
 
@@ -91,29 +87,32 @@ public class Customer {
     }
 
     public void setPersonalDailyDiscount(int personalDailyDiscount) {
-        if (this.personalDailyDiscount == 0)
+        if (this.personalDailyDiscount == 0) {
             this.personalDailyDiscount = personalDailyDiscount;
+        }
     }
 
     public boolean buyItems() {
         double priceAfterDiscount;
-        if (this.shopper.getPurchses().isEmpty())
+        if (this.shopper.getPurchses().isEmpty()) {
             return false;
+        }
 
         priceAfterDiscount = shopper.getSumCost() - (shopper.getSumCost() / 100.0 * personalDailyDiscount);
-        if (priceAfterDiscount > balance)
+        if (priceAfterDiscount > balance) {
             return false;
+        }
         balance -= priceAfterDiscount;
         shopper.getPurchses().clear();
         shopper.setSumCost(0);
         return true;
     }
 
-    public Shopper getShopper() {
+    public Order getShopper() {
         return shopper;
     }
 
-    public void setShopper(Shopper shopper) {
+    public void setShopper(Order shopper) {
         this.shopper = shopper;
     }
 
