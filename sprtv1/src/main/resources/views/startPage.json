@@ -1,0 +1,17 @@
+{
+  "URLs":"commands",
+  "GET http://localhost:8080/items":"Show items",
+  "GET http://localhost:8080/items/{id}":"Show item by ID",
+  "POST http://localhost:8080/items/{id}":"Add item to order",
+
+  "http://localhost:8080/items/categories":"Show categories",
+  "http://localhost:8080/items/categories/shoes":"Show shoes",
+  "http://localhost:8080/items/categories/jackets":"Show jackets",
+
+  "GET http://localhost:8080/orders":"Show ur orders",
+  "DELETE http://localhost:8080/orders/{id}":"Delete item from order by ID",
+  "POST http://localhost:8080/orders":"Buy all items from order",
+
+  "POST http://localhost:8080/login?login={urLogin}&pass={urPassword}":"Autorization",
+  "GET http://localhost:8080/account":"Users account"
+}
