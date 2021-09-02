@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.Setter;
 import shopper.Order;
 
+import java.util.Random;
+
 @Data
 public class Customer {
 
@@ -15,7 +17,8 @@ public class Customer {
     private String password;
     @Setter(AccessLevel.NONE)
     private int balance;
-    private int personalDailyDiscount;
+    @Setter(AccessLevel.NONE)
+    private int personalDiscount;
 
     private Order shopper;
 
@@ -26,20 +29,7 @@ public class Customer {
         this.password = password;
         this.balance = balance;
         this.shopper = shopper;
-        this.personalDailyDiscount = 0;
-    }
-
-
-    public void addMoney(int money) {
-        this.balance += money;
-    }
-
-    public boolean substructMoney(int money) {
-        if (this.balance - money >= 0) {
-            this.balance -= money;
-            return true;
-        } else
-            return false;
+        this.personalDiscount = getPersonalDiscount();
     }
 
     public void addItemToShopper(Item item) {
@@ -50,10 +40,8 @@ public class Customer {
         shopper.deleteItem(item);
     }
 
-    public void setPersonalDailyDiscount(int personalDailyDiscount) {
-        if (this.personalDailyDiscount == 0) {
-            this.personalDailyDiscount = personalDailyDiscount;
-        }
+    public int getPersonalDiscount() {
+        return new Random().nextInt(30 - 5 + 1) + 5;
     }
 
     public boolean buyItems() {
@@ -62,7 +50,7 @@ public class Customer {
             return false;
         }
 
-        priceAfterDiscount = shopper.getSumCost() - (shopper.getSumCost() / 100.0 * personalDailyDiscount);
+        priceAfterDiscount = shopper.getSumCost() - (shopper.getSumCost() / 100.0 * personalDiscount);
         if (priceAfterDiscount > balance) {
             return false;
         }

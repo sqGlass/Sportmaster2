@@ -56,7 +56,5 @@
 11) Просмотр аккаунта пользователя:
 	curl -X GET "http://localhost:8080/account"
 
-12) Совершить покупку:
-	curl -X POST "http://localhost:8080/myshopper/buy"
 
 

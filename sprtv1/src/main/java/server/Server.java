@@ -6,23 +6,22 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import dao.ConnectCustomersWithItem;
 import dao.CustomerDAO;
 import dao.ItemDAO;
-import model.Customer;
-import model.Item;
 
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.regex.Pattern;
 
 public class Server {
     private static HttpServer httpServer;
-    private static Customer customer;
+
     private static CustomerDAO customerDAO = new CustomerDAO();
     private static ItemDAO itemDAO = new ItemDAO();
+    private static ConnectCustomersWithItem connectCustomersWithItem = new ConnectCustomersWithItem();
 
     public static void main(String[] args) throws Exception {
         httpServer = HttpServer.create(new InetSocketAddress(8080), 0);
@@ -44,7 +43,6 @@ public class Server {
 
     static class Hello implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
-            System.out.println("helllp");
             Server.doResponse(t, "src/main/resources/views/startPage.json");
         }
     }
@@ -61,17 +59,17 @@ public class Server {
 
                 doResponse(t, "src/main/resources/views/autorizationError.json");
                 return;
-            } else if (params.get("login").length() < 1 || params.get("pass").length() < 1 ||
+            }
+            if (params.get("login").length() < 1 || params.get("pass").length() < 1 ||
                     customerDAO.findCustomerByLoginAndPassword(params.get("login"), params.get("pass")) == null) {
                 doResponse(t, "src/main/resources/views/autorizationError.json");
                 return;
             }
+            customerDAO.setCurrentCustomer(customerDAO.findCustomerByLoginAndPassword(params.get("login"), params.get("pass")));
 
-            customer = customerDAO.findCustomerByLoginAndPassword(params.get("login"), params.get("pass"));
-            customer.setPersonalDailyDiscount(getPersonalDailyDiscount());
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            mapper.writeValue(new File("src/main/resources/views/items.json"), customer);
+            mapper.writeValue(new File("src/main/resources/views/items.json"), customerDAO.getCurrentCustomer());
             Server.doResponse(t, "src/main/resources/views/items.json");
         }
     }
@@ -80,7 +78,7 @@ public class Server {
         public void handle(HttpExchange t) throws IOException {
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            mapper.writeValue(new File("src/main/resources/views/items.json"), customer);
+            mapper.writeValue(new File("src/main/resources/views/items.json"), customerDAO.getCurrentCustomer());
 
             Server.doResponse(t, "src/main/resources/views/items.json");
         }
@@ -126,16 +124,16 @@ public class Server {
                     Server.doResponse(t, "src/main/resources/views/startPage.json");
                     return;
                 }
-                if (customer == null) {
+                if (customerDAO.getCurrentCustomer() == null) {
                     doResponse(t, "src/main/resources/views/askAutorization.json");
                     return;
-                } else if (itemDAO.getItemById(id) != null) {
-                    customer.addItemToShopper(itemDAO.getItemById(id));
-                    itemDAO.deleteItemById(id);
                 }
+                connectCustomersWithItem.addItemToOrder(customerDAO, itemDAO, id);
+
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.enable(SerializationFeature.INDENT_OUTPUT);
-                mapper.writeValue(new File("src/main/resources/views/items.json"), customer.getShopper());
+                mapper.writeValue(new File("src/main/resources/views/items.json"),
+                        customerDAO.getCurrentCustomer().getShopper());
             }
             Server.doResponse(t, "src/main/resources/views/items.json");
         }
@@ -166,7 +164,7 @@ public class Server {
     static class MyShopper implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
             int id;
-            if (customer == null) {
+            if (customerDAO.getCurrentCustomer() == null) {
                 doResponse(t, "src/main/resources/views/askAutorization.json");
                 return;
             }
@@ -174,16 +172,17 @@ public class Server {
             if (t.getRequestMethod().equalsIgnoreCase("GET")) {
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.enable(SerializationFeature.INDENT_OUTPUT);
-                mapper.writeValue(new File("src/main/resources/views/items.json"), customer.getShopper());
+                mapper.writeValue(new File("src/main/resources/views/items.json"),
+                        customerDAO.getCurrentCustomer().getShopper());
             } else if (t.getRequestMethod().equalsIgnoreCase("POST")) {
-                if (customer.getShopper().getPurchses().isEmpty()) {
+                if (customerDAO.getCurrentCustomer().getShopper().getPurchses().isEmpty()) {
                     Server.doResponse(t, "src/main/resources/views/emptyShopper.json");
-                } else if (!customer.buyItems()) {
+                } else if (!customerDAO.getCurrentCustomer().buyItems()) {
                     Server.doResponse(t, "src/main/resources/views/notEnoughMoney.json");
                 } else {
                     ObjectMapper mapper = new ObjectMapper();
                     mapper.enable(SerializationFeature.INDENT_OUTPUT);
-                    mapper.writeValue(new File("src/main/resources/views/items.json"), customer);
+                    mapper.writeValue(new File("src/main/resources/views/items.json"), customerDAO.getCurrentCustomer());
                 }
             } else if (t.getRequestMethod().equalsIgnoreCase("DELETE")) {
                 // check for correct index
@@ -194,16 +193,10 @@ public class Server {
                     Server.doResponse(t, "src/main/resources/views/startPage.json");
                     return;
                 }
-                for (Item ite : customer.getShopper().getPurchses()) {
-                    if (ite.getId() == id) {
-                        customer.deleteItemFromShopper(ite);
-                        itemDAO.returnItemToShopFromShopper(ite);
-                        break;
-                    }
-                }
+                connectCustomersWithItem.deleteItemFromOrder(customerDAO, itemDAO, id);
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.enable(SerializationFeature.INDENT_OUTPUT);
-                mapper.writeValue(new File("src/main/resources/views/items.json"), customer.getShopper());
+                mapper.writeValue(new File("src/main/resources/views/items.json"), customerDAO.getCurrentCustomer().getShopper());
             }
             Server.doResponse(t, "src/main/resources/views/items.json");
         }
@@ -256,8 +249,5 @@ public class Server {
         return result;
     }
 
-    public static int getPersonalDailyDiscount() {
-        return new Random().nextInt(30 - 5 + 1) + 5;
-    }
 
 }
