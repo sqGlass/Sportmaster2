@@ -55,6 +55,7 @@
 
 11) Просмотр аккаунта пользователя:
 	curl -X GET "http://localhost:8080/account"
+	curl -X GET "http://localhost:8080/me"
 
 
 
