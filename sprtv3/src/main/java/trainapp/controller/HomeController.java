@@ -44,8 +44,9 @@ public class HomeController {
     Customer getAll(@RequestParam("login") String login,
                     @RequestParam("pass") String password) throws Exception {
         customerDAO.setCurrentCustomer(customerDAO.findCustomerByLoginAndPassword(login, password));
-        if (customerDAO.getCurrentCustomer() == null)
+        if (customerDAO.getCurrentCustomer() == null) {
             throw new Exception("User not found");
+        }
         return (customerDAO.getCurrentCustomer());
     }
 
@@ -53,8 +54,9 @@ public class HomeController {
     public @ResponseBody
     Customer getAccount() throws Exception {
 
-        if (customerDAO.getCurrentCustomer() == null)
+        if (customerDAO.getCurrentCustomer() == null) {
             throw new Exception("U r not login!");
+        }
         return (customerDAO.getCurrentCustomer());
     }
 
@@ -67,8 +69,9 @@ public class HomeController {
     @GetMapping(value = "/items/{itemId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody
     Item getItem(@PathVariable("itemId") int itemId) throws Exception {
-        if (itemDAO.getItemById(itemId) == null)
+        if (itemDAO.getItemById(itemId) == null) {
             throw new Exception("Item not found!");
+        }
         return (itemDAO.getItemById(itemId));
     }
 
@@ -77,8 +80,9 @@ public class HomeController {
     Customer itemToOrder(@PathVariable("itemId") int itemId) throws Exception {
 
         try {
-            if (itemDAO.getItemById(itemId) == null)
+            if (itemDAO.getItemById(itemId) == null) {
                 throw new IllegalArgumentException();
+            }
             connectCustomersWithItem.addItemToOrder(customerDAO, itemDAO, itemId);
             return (customerDAO.getCurrentCustomer());
         } catch (IllegalArgumentException ex) {
