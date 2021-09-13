@@ -1,115 +1,100 @@
 package trainapp.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import trainapp.dao.ConnectCustomerWithItem;
 import trainapp.dao.CustomerDAO;
 import trainapp.dao.ItemDAO;
+import trainapp.dao.NullUserException;
 import trainapp.models.Customer;
 import trainapp.models.Item;
 import trainapp.models.Order;
 
 import java.util.List;
+import java.util.Optional;
 
-@Controller
+@RestController
+@RequiredArgsConstructor
 public class HomeController {
 
     private final CustomerDAO customerDAO;
     private final ItemDAO itemDAO;
     private final ConnectCustomerWithItem connectCustomersWithItem;
 
-    @Autowired
-    public HomeController(CustomerDAO customerDAO, ItemDAO itemDAO, ConnectCustomerWithItem connectCustomersWithItem) {
-        this.customerDAO = customerDAO;
-        this.itemDAO = itemDAO;
-        this.connectCustomersWithItem = connectCustomersWithItem;
-    }
-
-
-    @ExceptionHandler(Exception.class)
-    public @ResponseBody
-    String handleAllException(Exception ex) {
-        return ex.getMessage();
-    }
-
     @GetMapping(value = "/")
-    public String sayHello() {
-        return "startPage";
+    public ModelAndView sayHello() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("startPage");
+        return modelAndView;
     }
 
     @PostMapping(value = "/login")
-    public @ResponseBody
-    Customer getAll(@RequestParam("login") String login,
-                    @RequestParam("pass") String password) throws Exception {
+    @SneakyThrows
+    public Customer getAll(@RequestParam("login") String login,
+                           @RequestParam("pass") String password) {
         customerDAO.setCurrentCustomer(customerDAO.findCustomerByLoginAndPassword(login, password));
         if (customerDAO.getCurrentCustomer() == null) {
-            throw new Exception("User not found");
+            throw new NullUserException("User not found");
         }
-        return (customerDAO.getCurrentCustomer());
+        return customerDAO.getCurrentCustomer();
     }
 
     @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    Customer getAccount() throws Exception {
+    @SneakyThrows
+    public Customer getAccount() {
 
         if (customerDAO.getCurrentCustomer() == null) {
-            throw new Exception("U r not login!");
+            throw new NullUserException("U r not login!");
         }
-        return (customerDAO.getCurrentCustomer());
+        return customerDAO.getCurrentCustomer();
     }
 
     @GetMapping(value = "/items", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    List<Item> getAll() {
-        return (itemDAO.getItems());
+    public List<Item> getAll() {
+        return itemDAO.getItems();
     }
 
     @GetMapping(value = "/items/{itemId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    Item getItem(@PathVariable("itemId") int itemId) throws Exception {
-        if (itemDAO.getItemById(itemId) == null) {
-            throw new Exception("Item not found!");
-        }
-        return (itemDAO.getItemById(itemId));
+    @SneakyThrows
+    public Item getItem(@PathVariable("itemId") int itemId) {
+        Optional<Item> optItem = Optional.ofNullable(itemDAO.getItemById(itemId));
+        return optItem.orElseThrow(() -> new IllegalArgumentException("Item not found!"));
     }
 
     @PostMapping(value = "/items/{itemId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    Customer itemToOrder(@PathVariable("itemId") int itemId) throws Exception {
-
-        try {
-            if (itemDAO.getItemById(itemId) == null) {
-                throw new IllegalArgumentException();
-            }
-            connectCustomersWithItem.addItemToOrder(customerDAO, itemDAO, itemId);
-            return (customerDAO.getCurrentCustomer());
-        } catch (IllegalArgumentException ex) {
-            throw new Exception("No item by this ID");
-        } catch (NullPointerException ex) {
-            throw new Exception("U have to be login!");
+    @SneakyThrows
+    public Customer itemToOrder(@PathVariable("itemId") int itemId) {
+        if (itemDAO.getItemById(itemId) == null) {
+            throw new IllegalArgumentException("No item by this ID");
         }
+
+        if (customerDAO.getCurrentCustomer() == null) {
+            throw new NullUserException("U r not login!");
+        }
+        connectCustomersWithItem.addItemToOrder(customerDAO, itemDAO, itemId);
+        return customerDAO.getCurrentCustomer();
+
     }
 
     @GetMapping(value = "/orders", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    Order showOrder() throws Exception {
-        try {
-            return customerDAO.getCurrentCustomer().getShopper();
-        } catch (NullPointerException e) {
-            throw new Exception("U have to be login!");
+    @SneakyThrows
+    public Order showOrder() {
+        if (customerDAO.getCurrentCustomer() == null) {
+            throw new NullUserException("U r not login!");
         }
+        return customerDAO.getCurrentCustomer().getShopper();
     }
 
     @PostMapping(value = "/orders", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    String buyOrder() {
+    public String buyOrder() {
 
         if (customerDAO.getCurrentCustomer() == null) {
-            return ("U have to be login!");
+            return "U have to be login!";
         }
-        if (customerDAO.getCurrentCustomer().getShopper().getPurchses().isEmpty()) {
+        if (customerDAO.getCurrentCustomer().getShopper().getPurchases().isEmpty()) {
             return "Order is empty!";
         }
         if (!customerDAO.getCurrentCustomer().buyItems()) {
@@ -119,40 +104,34 @@ public class HomeController {
     }
 
     @DeleteMapping(value = "/orders/{itemId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    Order buyOrder(@PathVariable("itemId") int itemId) throws Exception {
+    @SneakyThrows
+    public Order buyOrder(@PathVariable("itemId") int itemId) {
 
-        try {
-            if (customerDAO.getCurrentCustomer().isItemInOrder(itemId)) {
-                connectCustomersWithItem.deleteItemFromOrder(customerDAO, itemDAO, itemId);
-                return customerDAO.getCurrentCustomer().getShopper();
-            }
-            throw new IllegalArgumentException();
-        } catch (NullPointerException e) {
-            throw new Exception("U have to be login!");
-        } catch (IllegalArgumentException e) {
-            throw new Exception("No item in ur order by this ID");
+        if (customerDAO.getCurrentCustomer() == null) {
+            throw new NullUserException("U r not login!");
         }
+        if (!customerDAO.getCurrentCustomer().isItemInOrder(itemId)) {
+            throw new IllegalArgumentException("No item by this ID");
+        }
+        connectCustomersWithItem.deleteItemFromOrder(customerDAO, itemDAO, itemId);
+        return customerDAO.getCurrentCustomer().getShopper();
     }
 
     @GetMapping(value = "/items/categories", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    List<String> getItemsCategories() {
+    public List<String> getItemsCategories() {
 
-        return (itemDAO.getTypes());
+        return itemDAO.getTypes();
     }
 
     @GetMapping(value = "/items/categories/shoes", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    List<Item> getShoes() {
+    public List<Item> getShoes() {
 
-        return (itemDAO.getItemsByType("shoes"));
+        return itemDAO.getItemsByType("shoes");
     }
 
     @GetMapping(value = "/items/categories/jackets", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    List<Item> getJackets() {
+    public List<Item> getJackets() {
 
-        return (itemDAO.getItemsByType("jackets"));
+        return itemDAO.getItemsByType("jackets");
     }
 }

@@ -1,17 +1,15 @@
 package trainapp.models;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Random;
 
 @Data
+@Builder
 public class Customer {
 
     @Setter(AccessLevel.NONE)
-    private int id;
+    private Integer id;
     private String name;
     private String login;
     @ToString.Exclude
@@ -19,19 +17,10 @@ public class Customer {
     @Setter(AccessLevel.NONE)
     private int balance;
     @Setter(AccessLevel.NONE)
-    private int personalDiscount;
+    @Builder.Default
+    private int personalDiscount = takePersonalDiscount();
 
     private Order shopper;
-
-    public Customer(int id, String name, String login, String password, int balance, Order shopper) {
-        this.id = id;
-        this.name = name;
-        this.login = login;
-        this.password = password;
-        this.balance = balance;
-        this.shopper = shopper;
-        this.personalDiscount = getPersonalDiscount();
-    }
 
     public void addItemToShopper(Item item) {
         shopper.addItem(item);
@@ -41,12 +30,12 @@ public class Customer {
         shopper.deleteItem(item);
     }
 
-    public int getPersonalDiscount() {
+    public static int takePersonalDiscount() {
         return new Random().nextInt(30 - 5 + 1) + 5;
     }
 
     public boolean isItemInOrder(int id) {
-        for (Item ite : shopper.getPurchses()) {
+        for (Item ite : shopper.getPurchases()) {
             if (ite.getId() == id) {
                 return true;
             }
@@ -56,7 +45,7 @@ public class Customer {
 
     public boolean buyItems() {
         double priceAfterDiscount;
-        if (this.shopper.getPurchses().isEmpty()) {
+        if (this.shopper.getPurchases().isEmpty()) {
             return false;
         }
 
@@ -65,7 +54,7 @@ public class Customer {
             return false;
         }
         balance -= priceAfterDiscount;
-        shopper.getPurchses().clear();
+        shopper.getPurchases().clear();
         shopper.setSumCost(0);
         return true;
     }

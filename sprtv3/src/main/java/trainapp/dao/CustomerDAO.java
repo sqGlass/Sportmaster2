@@ -25,8 +25,26 @@ public class CustomerDAO {
     {
         customers = new ArrayList<>();
         id = new AtomicInteger(0);
-        customers.add(new Customer(id.getAndIncrement(), "Sasha", "sasha1337", "1234", 1500, new Order()));
-        customers.add(new Customer(id.getAndIncrement(), "Vasya", "vasyaKill", "777", 700, new Order()));
+        customers.add(Customer
+                .builder()
+                .id(id.getAndIncrement())
+                .name("Sasha")
+                .login("sasha1337")
+                .password("1234")
+                .balance(1500)
+                .shopper(new Order())
+                .build()
+        );
+        customers.add(Customer
+                .builder()
+                .id(id.getAndIncrement())
+                .name("Vasya")
+                .login("vasyaKill")
+                .password("777")
+                .balance(700)
+                .shopper(new Order())
+                .build()
+        );
     }
 
     public Customer findCustomerByLoginAndPassword(String login, String password) {
@@ -37,15 +55,5 @@ public class CustomerDAO {
         }
         return null;
     }
-
-    public Customer getCustomerById(int id) {
-        for (Customer cust : customers) {
-            if (cust.getId() == id) {
-                return cust;
-            }
-        }
-        return null;
-    }
-
 }
 

@@ -8,24 +8,24 @@ import java.util.List;
 @Data
 public class Order {
 
-    private int sumCost;
-    private List<Item> purchses;
+    private Integer sumCost;
+    private List<Item> purchases;
 
     {
         sumCost = 0;
-        purchses = new ArrayList<>();
+        purchases = new ArrayList<>();
     }
 
     public void addItem(Item item) {
-        if (!purchses.contains(item)) {
-            purchses.add(item);
+        if (!purchases.contains(item)) {
+            purchases.add(item);
             sumCost += item.getPrice();
         }
     }
 
     public void deleteItem(Item item) {
-        if (purchses.contains(item)) {
-            purchses.remove(item);
+        if (purchases.contains(item)) {
+            purchases.remove(item);
             sumCost -= item.getPrice();
         }
     }

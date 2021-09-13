@@ -23,12 +23,61 @@ public class ItemDAO {
 
     {
         items = new ArrayList<>();
-        items.add(new Item(IDs.getAndIncrement(), 46, 300, "shoes", "Zoom Freak 3", "red"));
-        items.add(new Item(IDs.getAndIncrement(), 49, 300, "shoes", "Zoom Freak 3", "green"));
-        items.add(new Item(IDs.getAndIncrement(), 45, 300, "shoes", "Zoom Freak 3", "black"));
+        Item ShoesPattern = Item
+                .builder()
+                .price(300)
+                .type("shoes")
+                .model("Zoom Freak 3")
+                .build();
 
-        items.add(new Item(IDs.getAndIncrement(), 52, 250, "jackets", "Jordan Essentials", "red"));
-        items.add(new Item(IDs.getAndIncrement(), 56, 250, "jackets", "Jordan Essentials", "red"));
+        Item JacketsPattern = Item
+                .builder()
+                .price(300)
+                .type("jackets")
+                .model("Jordan Essentials")
+                .color("red")
+                .build();
+        items.add(ShoesPattern
+                .toBuilder()
+                .id(IDs.getAndIncrement())
+                .size(46)
+                .color("red")
+                .build()
+        );
+        items.add(ShoesPattern
+                .toBuilder()
+                .id(IDs.getAndIncrement())
+                .size(49)
+                .color("green")
+                .build()
+        );
+        items.add(ShoesPattern
+                .toBuilder()
+                .id(IDs.getAndIncrement())
+                .size(45)
+                .color("black")
+                .build()
+        );
+
+        items.add(JacketsPattern
+                .toBuilder()
+                .id(IDs.getAndIncrement())
+                .size(52)
+                .build()
+        );
+        items.add(JacketsPattern
+                .toBuilder()
+                .id(IDs.getAndIncrement())
+                .size(56)
+                .build()
+        );
+
+//        items.add(new Item(IDs.getAndIncrement(), 46, 300, "shoes", "Zoom Freak 3", "red"));
+//        items.add(new Item(IDs.getAndIncrement(), 49, 300, "shoes", "Zoom Freak 3", "green"));
+//        items.add(new Item(IDs.getAndIncrement(), 45, 300, "shoes", "Zoom Freak 3", "black"));
+//
+//        items.add(new Item(IDs.getAndIncrement(), 52, 250, "jackets", "Jordan Essentials", "red"));
+//        items.add(new Item(IDs.getAndIncrement(), 56, 250, "jackets", "Jordan Essentials", "red"));
     }
 
     public List<Item> getItems() {

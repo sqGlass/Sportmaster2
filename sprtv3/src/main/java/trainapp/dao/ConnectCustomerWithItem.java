@@ -14,7 +14,7 @@ public class ConnectCustomerWithItem {
     }
 
     public void deleteItemFromOrder(CustomerDAO customerDAO, ItemDAO itemDAO, int itemID) {
-        for (Item ite : customerDAO.getCurrentCustomer().getShopper().getPurchses()) {
+        for (Item ite : customerDAO.getCurrentCustomer().getShopper().getPurchases()) {
             if (ite.getId() == itemID) {
                 customerDAO.getCurrentCustomer().deleteItemFromShopper(ite);
                 itemDAO.returnItemToShopFromShopper(ite);
