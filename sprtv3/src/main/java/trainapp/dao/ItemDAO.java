@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import trainapp.models.Item;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -22,7 +23,6 @@ public class ItemDAO {
     }
 
     {
-        items = new ArrayList<>();
         Item ShoesPattern = Item
                 .builder()
                 .price(300)
@@ -37,47 +37,40 @@ public class ItemDAO {
                 .model("Jordan Essentials")
                 .color("red")
                 .build();
-        items.add(ShoesPattern
-                .toBuilder()
-                .id(IDs.getAndIncrement())
-                .size(46)
-                .color("red")
-                .build()
-        );
-        items.add(ShoesPattern
-                .toBuilder()
-                .id(IDs.getAndIncrement())
-                .size(49)
-                .color("green")
-                .build()
-        );
-        items.add(ShoesPattern
-                .toBuilder()
-                .id(IDs.getAndIncrement())
-                .size(45)
-                .color("black")
-                .build()
-        );
 
-        items.add(JacketsPattern
-                .toBuilder()
-                .id(IDs.getAndIncrement())
-                .size(52)
-                .build()
-        );
-        items.add(JacketsPattern
-                .toBuilder()
-                .id(IDs.getAndIncrement())
-                .size(56)
-                .build()
-        );
+        items = Arrays.asList(ShoesPattern
+                        .toBuilder()
+                        .id(IDs.getAndIncrement())
+                        .size(49)
+                        .color("green")
+                        .build(),
 
-//        items.add(new Item(IDs.getAndIncrement(), 46, 300, "shoes", "Zoom Freak 3", "red"));
-//        items.add(new Item(IDs.getAndIncrement(), 49, 300, "shoes", "Zoom Freak 3", "green"));
-//        items.add(new Item(IDs.getAndIncrement(), 45, 300, "shoes", "Zoom Freak 3", "black"));
-//
-//        items.add(new Item(IDs.getAndIncrement(), 52, 250, "jackets", "Jordan Essentials", "red"));
-//        items.add(new Item(IDs.getAndIncrement(), 56, 250, "jackets", "Jordan Essentials", "red"));
+                        ShoesPattern
+                        .toBuilder()
+                        .id(IDs.getAndIncrement())
+                        .size(45)
+                        .color("black")
+                        .build(),
+
+                        ShoesPattern
+                        .toBuilder()
+                        .id(IDs.getAndIncrement())
+                        .size(46)
+                        .color("red")
+                        .build(),
+
+                        JacketsPattern
+                        .toBuilder()
+                        .id(IDs.getAndIncrement())
+                        .size(52)
+                        .build(),
+
+                        JacketsPattern
+                        .toBuilder()
+                        .id(IDs.getAndIncrement())
+                        .size(56)
+                        .build()
+                );
     }
 
     public List<Item> getItems() {

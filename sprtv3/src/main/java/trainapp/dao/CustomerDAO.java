@@ -9,6 +9,7 @@ import trainapp.models.Customer;
 import trainapp.models.Order;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -23,27 +24,26 @@ public class CustomerDAO {
     private AtomicInteger id;
 
     {
-        customers = new ArrayList<>();
         id = new AtomicInteger(0);
-        customers.add(Customer
-                .builder()
-                .id(id.getAndIncrement())
-                .name("Sasha")
-                .login("sasha1337")
-                .password("1234")
-                .balance(1500)
-                .shopper(new Order())
-                .build()
-        );
-        customers.add(Customer
-                .builder()
-                .id(id.getAndIncrement())
-                .name("Vasya")
-                .login("vasyaKill")
-                .password("777")
-                .balance(700)
-                .shopper(new Order())
-                .build()
+        customers = Arrays.asList(Customer
+                                .builder()
+                                .id(id.getAndIncrement())
+                                .name("Sasha")
+                                .login("sasha1337")
+                                .password("1234")
+                                .balance(1500)
+                                .shopper(new Order())
+                                .build(),
+
+                                Customer
+                                .builder()
+                                .id(id.getAndIncrement())
+                                .name("Vasya")
+                                .login("vasyaKill")
+                                .password("777")
+                                .balance(700)
+                                .shopper(new Order())
+                                .build()
         );
     }
 
